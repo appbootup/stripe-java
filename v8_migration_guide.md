@@ -1,26 +1,29 @@
 # Migration guide for version 8
 
 ## Required upgrade to latest Stripe API version
+
+### Version 8 is no longer backward compatible.
  Up until `stripe-java` version 7, model classes had been maintained in a backward-compatible
  way. Regardless of your [Stripe API version](https://dashboard.stripe.com/developers), you could
   always use the latest version of this client library. Starting with `stripe-java` 8.0.0, the 
   model classes only work safely with the latest Stripe API version. To use version 8.0.0, 
   [update to the latest version of the Stripe API](https://stripe.com/docs/upgrades#how-can-i-upgrade-my-api).
-  TODO: Add explicit version name of this first release - most likely after Avedon 2019-02-18.
+  This specific version 8.0.0 is pinned to 2019-03-18. 
 
+### Remaining on an old API version can cause deserialization failure on events.
  Under the hood, new version 8 sets `Stripe-Version` request header to `Stripe#API_VERSION` 
  statically-defined in the library. Making API requests alone is fine; the return JSON response 
  has schema according to the specified version in request header, and it is compatible with Java 
  model classes of the library. However, event integration without upgrading your API version can 
  result in unhandled failures, both for webhooks and `/v1/events/*` via `Event#retrieve`.
  
+### 
  The event data object in `Event#data#object` is rendered according to your Stripe API 
- version at the time of its creation. Without upgrading your API version, using this 
- library pinned at a specific version has no implication on the JSON schema of the data 
- object; setting version in the header to retrieve events will only render the outer wrapper and 
+ version at the time of its creation. Using this version-pinned library has no 
+ implication on the JSON schema of the response data object; setting version in the header to retrieve events will only render the outer wrapper and 
  metadata as the specified version, but not the inner data object. Similarly, the data object in 
- webhook events are also rendered using Stripe API version you're on. Thus, simply deserializing 
- this data object--on old API version--to the model of latest schema in this library can cause 
+ webhook events are also rendered at your Stripe API version when it was created. Thus, simply 
+ deserializing this data object--on old API version--to the model of latest schema in this library can cause 
  incomplete deserialized object or runtime exceptions. It is necessary that you upgrade to the 
  latest API version to ensure events are created with the same API version supported by this library. 
  
