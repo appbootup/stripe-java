@@ -73,6 +73,9 @@ public class Charge extends ApiResource implements BalanceTransactionSource, Met
   @Setter(lombok.AccessLevel.NONE)
   ExpandableField<BalanceTransaction> balanceTransaction;
 
+  @SerializedName("billing_details")
+  PaymentMethod.BillingDetails billingDetails;
+
   /**
    * If the charge was created without capturing, this Boolean represents whether it is still
    * uncaptured or has since been captured.
@@ -583,6 +586,7 @@ public class Charge extends ApiResource implements BalanceTransactionSource, Met
    * Updates the specified charge by setting the values of the parameters passed. Any parameters not
    * provided will be left unchanged.
    */
+  @Override
   public Charge update(Map<String, Object> params) throws StripeException {
     return update(params, (RequestOptions) null);
   }
@@ -591,6 +595,7 @@ public class Charge extends ApiResource implements BalanceTransactionSource, Met
    * Updates the specified charge by setting the values of the parameters passed. Any parameters not
    * provided will be left unchanged.
    */
+  @Override
   public Charge update(Map<String, Object> params, RequestOptions options) throws StripeException {
     String url =
         String.format("%s%s", Stripe.getApiBase(), String.format("/v1/charges/%s", this.getId()));
